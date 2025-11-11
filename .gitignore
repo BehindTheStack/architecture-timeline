@@ -1,2 +1,55 @@
+# Dependencies
 node_modules/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+*.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.turbo/
 .next/
+out/
+build/
+
+# Production
+dist/
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+htmlcov/
+.coverage
+*.cover
+.pytest_cache/
+
+# Backups
+*.old.md
+*.backup
+
+# Python cache
+api/__pycache__/
