@@ -36,8 +36,7 @@ export default function TimelineVisualization({ entries, onPostClick }: Timeline
     const MAX_ITEMS = 200 // Netflix: renderiza apenas viewport + buffer
     const sortedEntries = entries
       .filter(e => e.date !== null)
-      .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
-      .slice(0, MAX_ITEMS) // Top 200 mais recentes
+      .slice(0, MAX_ITEMS) // Top 200 (já vem ordenado do parent)
 
     // Prepare data for vis-timeline
     const items = sortedEntries.map((entry, idx) => {

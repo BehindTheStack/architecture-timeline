@@ -12,14 +12,7 @@ interface AdvancedFiltersProps {
   availableCategories?: string[]
 }
 
-/**
- * OPÇÃO 1: "Spotify Controls Style"
- * - Controles compactos com ícones destacados
- * - Seções expansíveis com animações suaves
- * - Badge de "Active" quando tem filtros
- * - Design minimalista e elegante
- */
-export default function AdvancedFiltersSpotify({ 
+export default function AdvancedFilters({ 
   onDateRangeChange, 
   onCategoryChange,
   onSortChange,
@@ -258,6 +251,31 @@ export default function AdvancedFiltersSpotify({
               </button>
             )}
           </div>
+
+          {/* Info */}
+          {hasActiveFilters && (
+            <div className="pt-2 border-t border-gray-700 space-y-1">
+              {(startYear || endYear) && (
+                <p className="text-xs text-gray-500">
+                  📅 Range: <span className="text-blue-400 font-medium">{startYear || 'earliest'}</span>
+                  {' → '}
+                  <span className="text-blue-400 font-medium">{endYear || 'latest'}</span>
+                </p>
+              )}
+              {selectedCategories.length > 0 && (
+                <p className="text-xs text-gray-500">
+                  🏷️ Categories: <span className="text-purple-400 font-medium">{selectedCategories.join(', ')}</span>
+                </p>
+              )}
+              {sortBy !== 'date-desc' && (
+                <p className="text-xs text-gray-500">
+                  🔽 Sort: <span className="text-gray-400 font-medium">
+                    {sortBy === 'date-asc' ? 'Oldest First' : sortBy === 'title-asc' ? 'Title (A-Z)' : 'Title (Z-A)'}
+                  </span>
+                </p>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -48,6 +48,31 @@ export default function Home() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [sortBy, setSortBy] = useState<string>('date-desc')
 
+  // Apply sorting reactively whenever entries or sortBy changes
+  const sortedEntries = useMemo(() => {
+    const sorted = [...entries]
+    switch (sortBy) {
+      case 'date-desc':
+        return sorted.sort((a, b) => {
+          if (!a.date) return 1
+          if (!b.date) return -1
+          return new Date(b.date).getTime() - new Date(a.date).getTime()
+        })
+      case 'date-asc':
+        return sorted.sort((a, b) => {
+          if (!a.date) return 1
+          if (!b.date) return -1
+          return new Date(a.date).getTime() - new Date(b.date).getTime()
+        })
+      case 'title-asc':
+        return sorted.sort((a, b) => a.title.localeCompare(b.title))
+      case 'title-desc':
+        return sorted.sort((a, b) => b.title.localeCompare(a.title))
+      default:
+        return sorted
+    }
+  }, [entries, sortBy])
+
   useEffect(() => {
     fetchLayers()
     fetchTimeline()
@@ -63,7 +88,7 @@ export default function Home() {
     }, 300) // Debounce 300ms
 
     return () => clearTimeout(timer)
-  }, [selectedLayers, searchQuery, dateRange, sortBy])
+  }, [selectedLayers, searchQuery, dateRange])
 
   const fetchLayers = async () => {
     try {
@@ -99,10 +124,8 @@ export default function Home() {
         })
       }
       
-      // Apply sorting
-      const sortedEntries = sortEntries(filteredEntries)
-      
-      setEntries(sortedEntries)
+      // Sorting is applied reactively via useMemo
+      setEntries(filteredEntries)
     } catch (error) {
       console.error('Failed to fetch timeline:', error)
     } finally {
@@ -136,6 +159,7 @@ export default function Home() {
         })
       }
       
+      // Sorting is applied reactively via useMemo
       setEntries(filteredResults)
     } catch (error) {
       console.error('Failed to search posts:', error)
@@ -145,6 +169,7 @@ export default function Home() {
   }
 
   const toggleLayer = (layerName: string) => {
+    setLoading(true) // Show loading immediately
     setSelectedLayers(prev =>
       prev.includes(layerName)
         ? prev.filter(l => l !== layerName)
@@ -157,6 +182,7 @@ export default function Home() {
   }
 
   const handleDateRangeChange = (startYear: string | null, endYear: string | null) => {
+    setLoading(true) // Show loading immediately
     setDateRange({ 
       startYear: startYear ? parseInt(startYear) : null, 
       endYear: endYear ? parseInt(endYear) : null 
@@ -164,36 +190,12 @@ export default function Home() {
   }
 
   const handleCategoryChange = (categories: string[]) => {
+    setLoading(true) // Show loading immediately
     setSelectedCategories(categories)
   }
 
   const handleSortChange = (sort: string) => {
     setSortBy(sort)
-  }
-
-  // Apply client-side sorting
-  const sortEntries = (entriesToSort: TimelineEntry[]) => {
-    const sorted = [...entriesToSort]
-    switch (sortBy) {
-      case 'date-desc':
-        return sorted.sort((a, b) => {
-          if (!a.date) return 1
-          if (!b.date) return -1
-          return new Date(b.date).getTime() - new Date(a.date).getTime()
-        })
-      case 'date-asc':
-        return sorted.sort((a, b) => {
-          if (!a.date) return 1
-          if (!b.date) return -1
-          return new Date(a.date).getTime() - new Date(b.date).getTime()
-        })
-      case 'title-asc':
-        return sorted.sort((a, b) => a.title.localeCompare(b.title))
-      case 'title-desc':
-        return sorted.sort((a, b) => b.title.localeCompare(a.title))
-      default:
-        return sorted
-    }
   }
 
   // Get unique categories from entries
@@ -238,7 +240,7 @@ export default function Home() {
                   Netflix Architecture Timeline
                 </h1>
                 <p className="text-sm text-gray-400">
-                  Explore {entries.length} technical posts across {layers.length} architecture layers
+                  Explore {sortedEntries.length} technical posts across {layers.length} architecture layers
                 </p>
               </div>
             </div>
@@ -308,11 +310,11 @@ export default function Home() {
                 className="w-full bg-gray-800/50 border border-gray-700 rounded-lg pl-11 pr-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all"
               />
             </div>
-            {!loading && entries.length > 0 && (
+            {!loading && sortedEntries.length > 0 && (
               <div className="flex items-center justify-between">
-                {viewMode === 'timeline' && entries.length > 300 && (
+                {viewMode === 'timeline' && sortedEntries.length > 300 && (
                   <span className="text-xs text-yellow-500 bg-yellow-500/10 px-2 py-1 rounded border border-yellow-500/30">
-                    ⚠️ {entries.length} posts - Cards/Magazine View recomendados
+                    ⚠️ {sortedEntries.length} posts - Cards/Magazine View recomendados
                   </span>
                 )}
               </div>
@@ -358,25 +360,25 @@ export default function Home() {
               <>
                 {viewMode === 'cards' && (
                   <TimelineCards
-                    entries={entries}
+                    entries={sortedEntries}
                     onPostClick={handlePostClick}
                   />
                 )}
                 {viewMode === 'magazine' && (
                   <TimelineMagazine
-                    entries={entries}
+                    entries={sortedEntries}
                     onPostClick={handlePostClick}
                   />
                 )}
                 {viewMode === 'grid' && (
                   <TimelineGrid
-                    entries={entries}
+                    entries={sortedEntries}
                     onPostClick={handlePostClick}
                   />
                 )}
                 {viewMode === 'timeline' && (
                   <TimelineVisualization
-                    entries={entries}
+                    entries={sortedEntries}
                     onPostClick={handlePostClick}
                   />
                 )}

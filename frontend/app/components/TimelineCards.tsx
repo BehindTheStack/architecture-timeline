@@ -22,12 +22,8 @@ const POSTS_PER_PAGE = 30
 export default function TimelineCards({ entries, onPostClick }: TimelineCardsProps) {
   const [loadedPages, setLoadedPages] = useState(1)
   
-  // Sort by date descending
-  const sortedEntries = useMemo(() => {
-    return [...entries]
-      .filter(e => e.date)
-      .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
-  }, [entries])
+  // Entries are already sorted by parent component
+  const sortedEntries = entries.filter(e => e.date)
 
   // Paginated display
   const displayedEntries = useMemo(() => {

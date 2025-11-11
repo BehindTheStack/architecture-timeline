@@ -17,13 +17,6 @@ interface LayerFilterProps {
   onToggleLayer: (layerName: string) => void
 }
 
-/**
- * OPÇÃO 1: "Spotify Sidebar Style"
- * - Cards compactos com hover effects
- * - Contadores discretos à direita
- * - Gradientes sutis no hover
- * - Clear all no topo como botão secundário
- */
 export default function LayerFilterSpotify({ layers, selectedLayers, onToggleLayer }: LayerFilterProps) {
   const totalPosts = layers.reduce((sum, l) => sum + l.count, 0)
   const selectedCount = selectedLayers.length

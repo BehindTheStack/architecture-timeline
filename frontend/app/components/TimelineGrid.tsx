@@ -28,10 +28,11 @@ const getLayerColorClasses = (layerId: string): string => {
 export default function TimelineGrid({ entries, onPostClick }: TimelineGridProps) {
   const [expandedYears, setExpandedYears] = useState<Set<string>>(new Set(['2024', '2025']))
   
-  // Agrupar posts por ano
+  // Agrupar posts por ano (mantendo a ordem recebida do parent)
   const groupedByYear = useMemo(() => {
     const groups: Record<string, TimelineEntry[]> = {}
     
+    // Manter a ordem original dos entries (já vem ordenado do parent)
     entries
       .filter(e => e.date)
       .forEach(entry => {
@@ -40,12 +41,12 @@ export default function TimelineGrid({ entries, onPostClick }: TimelineGridProps
         groups[year].push(entry)
       })
     
-    // Ordenar anos decrescente
+    // Ordenar anos decrescente (mas preservar ordem interna dos posts)
     return Object.entries(groups)
       .sort(([a], [b]) => b.localeCompare(a))
       .map(([year, posts]) => ({
         year,
-        posts: posts.sort((a, b) => (b.date || '').localeCompare(a.date || '')),
+        posts: posts, // Já vem ordenado do parent
         count: posts.length
       }))
   }, [entries])

@@ -23,12 +23,8 @@ export default function TimelineMagazine({ entries, onPostClick }: TimelineMagaz
   const [currentPage, setCurrentPage] = useState(1)
   const [loadedPages, setLoadedPages] = useState(1)
   
-  // Sort by date descending
-  const sortedEntries = useMemo(() => {
-    return [...entries]
-      .filter(e => e.date)
-      .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
-  }, [entries])
+  // Entries are already sorted by parent component
+  const sortedEntries = entries.filter(e => e.date)
 
   // Group posts by year/month for section headers
   const groupedEntries = useMemo(() => {
