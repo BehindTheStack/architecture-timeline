@@ -10,7 +10,7 @@ import LayerFilter from './components/LayerFilter'
 import StatsPanel from './components/StatsPanel'
 import PostDetail from './components/PostDetail'
 import AdvancedFilters from './components/AdvancedFilters'
-import Credits from './components/Credits'
+import CreditsFooter from './components/CreditsFooter'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
@@ -270,7 +270,7 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-6 py-8 pb-24">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
           <div className="lg:col-span-1 space-y-6">
@@ -340,8 +340,8 @@ export default function Home() {
         />
       )}
 
-      {/* Credits - Spotify Style */}
-      <Credits />
+      {/* Credits - GitHub Footer Style */}
+      <CreditsFooter />
     </div>
   )
 }
