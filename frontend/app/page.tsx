@@ -47,6 +47,41 @@ export default function Home() {
   })
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [sortBy, setSortBy] = useState<string>('date-desc')
+  const [showHeader, setShowHeader] = useState(true)
+  const lastScrollYRef = React.useRef(0)
+
+  // Auto-hide header on scroll down, show on scroll up (BigTech pattern)
+  // Optimized with useRef to avoid recreating handler
+  useEffect(() => {
+    let ticking = false
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY
+          
+          // Show header when at top
+          if (currentScrollY < 10) {
+            setShowHeader(true)
+          }
+          // Hide on scroll down, show on scroll up
+          else if (currentScrollY > lastScrollYRef.current && currentScrollY > 100) {
+            setShowHeader(false)
+          } else if (currentScrollY < lastScrollYRef.current) {
+            setShowHeader(true)
+          }
+          
+          lastScrollYRef.current = currentScrollY
+          ticking = false
+        })
+        
+        ticking = true
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   // Apply sorting reactively whenever entries or sortBy changes
   const sortedEntries = useMemo(() => {
@@ -227,8 +262,10 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
-      {/* Header */}
-      <header className="border-b border-gray-800 bg-black/50 backdrop-blur-lg sticky top-0 z-50">
+      {/* Header - Auto-hide on scroll down (BigTech pattern) */}
+      <header className={`border-b border-gray-800 bg-black/50 backdrop-blur-lg fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ease-out will-change-transform ${
+        showHeader ? 'translate-y-0' : '-translate-y-full'
+      }`}>
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -250,7 +287,7 @@ export default function Home() {
               <div className="flex bg-gray-800 rounded-lg p-1 gap-0.5">
                 <button
                   onClick={() => setViewMode('cards')}
-                  className={`p-2 rounded transition-colors ${viewMode === 'cards'
+                  className={`p-2 rounded transition-colors duration-200 ${viewMode === 'cards'
                       ? 'bg-red-600 text-white'
                       : 'text-gray-400 hover:text-white'
                     }`}
@@ -260,7 +297,7 @@ export default function Home() {
                 </button>
                 <button
                   onClick={() => setViewMode('magazine')}
-                  className={`p-2 rounded transition-colors ${viewMode === 'magazine'
+                  className={`p-2 rounded transition-colors duration-200 ${viewMode === 'magazine'
                       ? 'bg-red-600 text-white'
                       : 'text-gray-400 hover:text-white'
                     }`}
@@ -270,7 +307,7 @@ export default function Home() {
                 </button>
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded transition-colors ${viewMode === 'grid'
+                  className={`p-2 rounded transition-colors duration-200 ${viewMode === 'grid'
                       ? 'bg-red-600 text-white'
                       : 'text-gray-400 hover:text-white'
                     }`}
@@ -323,9 +360,12 @@ export default function Home() {
         </div>
       </header>
 
+      {/* Spacer for fixed header */}
+      <div className="h-[140px]"></div>
+
       <div className="container mx-auto px-6 py-8 pb-24">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Sidebar */}
+          {/* Sidebar - Flows naturally with content (Medium/Dev.to pattern) */}
           <div className="lg:col-span-1 space-y-6">
             <LayerFilter
               layers={layers}
