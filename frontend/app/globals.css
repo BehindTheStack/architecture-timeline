@@ -1,0 +1,161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0f0f0f;
+  --foreground: #ededed;
+  --card: #1a1a1a;
+  --card-foreground: #ededed;
+  --primary: #e50914;
+  --primary-foreground: #ffffff;
+  --secondary: #831010;
+  --muted: #2a2a2a;
+  --border: #2a2a2a;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--muted);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* Timeline styles - OTIMIZADO PARA PERFORMANCE */
+.vis-timeline {
+  border: none !important;
+  font-family: inherit !important;
+  background: transparent !important;
+}
+
+.vis-item {
+  border-width: 1px !important;
+  font-weight: 500 !important;
+  /* REMOVIDO: transition causa lag com muitos items */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+  will-change: transform !important; /* GPU acceleration */
+}
+
+.vis-item:hover {
+  /* SIMPLIFICADO: menos efeitos = mais performance */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+  z-index: 50 !important;
+  filter: brightness(1.1) !important;
+}
+
+.vis-item.vis-selected {
+  box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.6) !important;
+  z-index: 51 !important;
+  filter: brightness(1.2) !important;
+}
+
+.vis-item .vis-item-content {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  padding: 0 !important;
+  line-height: 1.2 !important;
+}
+
+.vis-time-axis .vis-text {
+  color: var(--foreground) !important;
+  font-size: 11px !important;
+}
+
+.vis-time-axis .vis-grid.vis-minor {
+  border-color: rgba(42, 42, 42, 0.3) !important; /* Menos visível */
+  border-width: 1px !important;
+}
+
+.vis-time-axis .vis-grid.vis-major {
+  border-color: rgba(42, 42, 42, 0.6) !important; /* Menos visível */
+  border-width: 1px !important;
+}
+
+/* REMOVER linhas verticais bugadas */
+.vis-panel.vis-center .vis-grid {
+  pointer-events: none !important; /* Não interferir com mouse */
+}
+
+.vis-panel.vis-background {
+  background-color: var(--card) !important;
+}
+
+.vis-panel.vis-center,
+.vis-panel.vis-left,
+.vis-panel.vis-right {
+  border-color: var(--border) !important;
+}
+
+.vis-labelset {
+  background-color: rgba(26, 26, 26, 0.95) !important;
+  border-right: 2px solid var(--border) !important;
+}
+
+.vis-labelset .vis-label {
+  color: var(--foreground) !important;
+  border-bottom: 1px solid var(--border) !important;
+  padding: 6px 10px !important;
+  font-size: 11px !important;
+  background-color: rgba(26, 26, 26, 0.98) !important;
+}
+
+.vis-labelset .vis-label:hover {
+  background-color: rgba(42, 42, 42, 0.7) !important;
+}
+
+.vis-foreground .vis-group {
+  border-bottom: 1px solid rgba(42, 42, 42, 0.5) !important; /* Menos visível */
+}
+
+/* CRÍTICO: Remover linhas fantasmas que aparecem ao passar mouse */
+.vis-itemset {
+  overflow: hidden !important;
+}
+
+.vis-foreground .vis-axis {
+  display: none !important; /* Remove eixos extras que causam linhas */
+}
+
+/* Custom scrollbar for timeline */
+.vis-timeline::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.vis-timeline::-webkit-scrollbar-track {
+  background: var(--card);
+  border-radius: 4px;
+}
+
+.vis-timeline::-webkit-scrollbar-thumb {
+  background: var(--muted);
+  border-radius: 4px;
+}
+
+.vis-timeline::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}

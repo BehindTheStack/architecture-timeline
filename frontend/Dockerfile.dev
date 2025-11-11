@@ -1,0 +1,49 @@
+# Dockerfile.dev - Desenvolvimento com hot-reload
+# Otimizado para desenvolvimento rápido
+
+FROM node:18-alpine AS base
+
+# Otimizações de performance para npm/node
+ENV NPM_CONFIG_UPDATE_NOTIFIER=false \
+    NPM_CONFIG_FUND=false \
+    NPM_CONFIG_LOGLEVEL=error \
+    NPM_CONFIG_PREFER_OFFLINE=true \
+    NPM_CONFIG_PROGRESS=false \
+    NODE_OPTIONS="--max-old-space-size=4096"
+
+# Configurações de segurança
+RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
+    apk add --no-cache libc6-compat dumb-init && \
+    addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001
+
+WORKDIR /app
+
+# =============================================================================
+# Estágio de DESENVOLVIMENTO
+# =============================================================================
+FROM base AS development
+
+ENV NODE_ENV=development \
+    NEXT_TELEMETRY_DISABLED=1
+
+# Copiar package files e instalar deps ANTES de copiar código
+COPY package.json package-lock.json ./
+
+# Instalar dependências com cache otimizado
+RUN --mount=type=cache,target=/root/.npm,sharing=locked \
+    npm install --prefer-offline --no-audit --ignore-scripts && \
+    npm rebuild
+
+# Criar diretório .next com permissões corretas
+RUN mkdir -p .next && \
+    chown -R nextjs:nodejs /app
+
+# Mudar para usuário nextjs
+USER nextjs
+
+# Expor porta
+EXPOSE 3000
+
+# Comando de desenvolvimento com hot-reload
+CMD ["dumb-init", "npm", "run", "dev"]
