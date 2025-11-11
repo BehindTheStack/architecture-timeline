@@ -198,6 +198,24 @@ docker-compose -f docker-compose.dev.yml up -d --build
 - **Frontend**: Next.js standalone output, SWC minification, automatic code splitting
 - **Backend**: uvloop for faster async I/O, httptools for faster HTTP parsing
 - **Docker**: Multi-stage builds with layer caching, minimal base images
+- **Caching**: Multi-layer strategy (in-memory, LRU, HTTP headers) - see [PERFORMANCE.md](PERFORMANCE.md)
+
+## 🏗️ Architecture Layer Configuration
+
+The application uses a centralized layer configuration system that synchronizes with the ML classification pipeline. All layer definitions, colors, and metadata are managed in `frontend/app/lib/layers.ts`.
+
+**Current Layers (9 ML-classified)**:
+- Backend APIs (Orange)
+- Video Streaming (Pink)
+- Platform Tooling (Yellow)
+- Data Infrastructure (Blue)
+- Observability (Indigo)
+- Engineering Culture (Purple)
+- Performance (Red)
+- Distributed Systems (Green)
+- Cloud Infrastructure (Cyan)
+
+**📚 For detailed information on layer management, synchronization with the ML pipeline, and how to update layers after retraining, see [LAYER_CONFIGURATION.md](LAYER_CONFIGURATION.md)**
 - **UI**: Infinite scroll pagination (30 posts/page), lazy loading, debounced search
 - **Filtering**: Client-side sorting and filtering for instant response
 - **Data**: JSON-based storage with in-memory caching

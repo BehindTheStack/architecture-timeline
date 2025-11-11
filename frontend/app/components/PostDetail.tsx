@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { X, ExternalLink, Calendar, Tag } from 'lucide-react'
+import { getLayerConfig, getLayerName } from '../lib/layers'
 
 interface TimelineEntry {
   path: string
@@ -16,18 +17,12 @@ interface PostDetailProps {
   onClose: () => void
 }
 
-const LAYER_COLORS: Record<string, string> = {
-  'data': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  'streaming': 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-  'video/encoding': 'bg-pink-500/20 text-pink-400 border-pink-500/30',
-  'infrastructure': 'bg-green-500/20 text-green-400 border-green-500/30',
-  'platform': 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-  'frontend/ui': 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
-  'api/backend': 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-  'observability': 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30',
-  'ml/data-science': 'bg-red-500/20 text-red-400 border-red-500/30',
-  'security': 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-  'uncategorized': 'bg-gray-500/20 text-gray-400 border-gray-500/30',
+/**
+ * Helper to get layer color classes (combines bg, text, border)
+ */
+const getLayerColorClasses = (layerId: string): string => {
+  const config = getLayerConfig(layerId)
+  return `${config.bgClass} ${config.textClass} ${config.borderClass}`
 }
 
 export default function PostDetail({ post, onClose }: PostDetailProps) {
@@ -99,11 +94,9 @@ export default function PostDetail({ post, onClose }: PostDetailProps) {
               {post.layers.map((layer) => (
                 <span
                   key={layer}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium border ${
-                    LAYER_COLORS[layer] || LAYER_COLORS['uncategorized']
-                  }`}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium border ${getLayerColorClasses(layer)}`}
                 >
-                  {layer}
+                  {getLayerName(layer)}
                 </span>
               ))}
             </div>

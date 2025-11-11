@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react'
 import { Calendar, Clock, Layers, Tag, ChevronRight, TrendingUp, Zap, Database, Globe } from 'lucide-react'
+import { getLayerGradient, getLayerName, getLayerIcon, getLayerConfig } from '../lib/layers'
 
 interface TimelineEntry {
   path: string
@@ -14,64 +15,6 @@ interface TimelineEntry {
 interface TimelineMagazineProps {
   entries: TimelineEntry[]
   onPostClick: (entry: TimelineEntry) => void
-}
-
-const LAYER_CONFIG: Record<string, { color: string; gradient: string; icon: React.ReactNode }> = {
-  'data': {
-    color: 'blue',
-    gradient: 'from-blue-500 to-blue-700',
-    icon: <Database className="w-4 h-4" />
-  },
-  'streaming': {
-    color: 'purple',
-    gradient: 'from-purple-500 to-purple-700',
-    icon: <Zap className="w-4 h-4" />
-  },
-  'video/encoding': {
-    color: 'pink',
-    gradient: 'from-pink-500 to-pink-700',
-    icon: <Globe className="w-4 h-4" />
-  },
-  'infrastructure': {
-    color: 'green',
-    gradient: 'from-green-500 to-green-700',
-    icon: <Globe className="w-4 h-4" />
-  },
-  'platform': {
-    color: 'yellow',
-    gradient: 'from-yellow-500 to-yellow-700',
-    icon: <Globe className="w-4 h-4" />
-  },
-  'frontend/ui': {
-    color: 'cyan',
-    gradient: 'from-cyan-500 to-cyan-700',
-    icon: <Globe className="w-4 h-4" />
-  },
-  'api/backend': {
-    color: 'orange',
-    gradient: 'from-orange-500 to-orange-700',
-    icon: <Globe className="w-4 h-4" />
-  },
-  'observability': {
-    color: 'indigo',
-    gradient: 'from-indigo-500 to-indigo-700',
-    icon: <TrendingUp className="w-4 h-4" />
-  },
-  'ml/data-science': {
-    color: 'red',
-    gradient: 'from-red-500 to-red-700',
-    icon: <Zap className="w-4 h-4" />
-  },
-  'security': {
-    color: 'emerald',
-    gradient: 'from-emerald-500 to-emerald-700',
-    icon: <Globe className="w-4 h-4" />
-  },
-  'uncategorized': {
-    color: 'gray',
-    gradient: 'from-gray-500 to-gray-700',
-    icon: <Tag className="w-4 h-4" />
-  },
 }
 
 const POSTS_PER_PAGE = 24
@@ -217,7 +160,7 @@ export default function TimelineMagazine({ entries, onPostClick }: TimelineMagaz
           if (showSection) currentSection = entryYearMonth
 
           const primaryLayer = entry.layers[0] || 'uncategorized'
-          const config = LAYER_CONFIG[primaryLayer] || LAYER_CONFIG['uncategorized']
+          const config = getLayerConfig(primaryLayer)
 
           return (
             <React.Fragment key={`${entry.path}-${idx}`}>
@@ -258,14 +201,14 @@ export default function TimelineMagazine({ entries, onPostClick }: TimelineMagaz
                     {/* Categories */}
                     <div className="flex items-center gap-2 mb-3">
                       {entry.layers.slice(0, 3).map((layer, i) => {
-                        const layerConfig = LAYER_CONFIG[layer] || LAYER_CONFIG['uncategorized']
+                        const layerConfig = getLayerConfig(layer)
                         return (
                           <span
                             key={i}
                             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-${layerConfig.color}-500/20 text-${layerConfig.color}-400 border border-${layerConfig.color}-500/30`}
                           >
                             {layerConfig.icon}
-                            {layer}
+                            {getLayerName(layer)}
                           </span>
                         )
                       })}

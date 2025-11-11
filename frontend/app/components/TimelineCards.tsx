@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react'
 import { Calendar, Clock, Layers, Tag, TrendingUp, Zap, Database, Globe, ArrowUpRight } from 'lucide-react'
+import { getLayerGradient, getLayerName, getLayerIcon, getLayerConfig } from '../lib/layers'
 
 interface TimelineEntry {
   path: string
@@ -14,86 +15,6 @@ interface TimelineEntry {
 interface TimelineCardsProps {
   entries: TimelineEntry[]
   onPostClick: (entry: TimelineEntry) => void
-}
-
-const LAYER_CONFIG: Record<string, { color: string; gradient: string; bgClass: string; textClass: string; borderClass: string }> = {
-  'data': {
-    color: 'blue',
-    gradient: 'from-blue-500 to-blue-700',
-    bgClass: 'bg-blue-500/10',
-    textClass: 'text-blue-400',
-    borderClass: 'border-blue-500/30'
-  },
-  'streaming': {
-    color: 'purple',
-    gradient: 'from-purple-500 to-purple-700',
-    bgClass: 'bg-purple-500/10',
-    textClass: 'text-purple-400',
-    borderClass: 'border-purple-500/30'
-  },
-  'video/encoding': {
-    color: 'pink',
-    gradient: 'from-pink-500 to-pink-700',
-    bgClass: 'bg-pink-500/10',
-    textClass: 'text-pink-400',
-    borderClass: 'border-pink-500/30'
-  },
-  'infrastructure': {
-    color: 'green',
-    gradient: 'from-green-500 to-green-700',
-    bgClass: 'bg-green-500/10',
-    textClass: 'text-green-400',
-    borderClass: 'border-green-500/30'
-  },
-  'platform': {
-    color: 'yellow',
-    gradient: 'from-yellow-500 to-yellow-700',
-    bgClass: 'bg-yellow-500/10',
-    textClass: 'text-yellow-400',
-    borderClass: 'border-yellow-500/30'
-  },
-  'frontend/ui': {
-    color: 'cyan',
-    gradient: 'from-cyan-500 to-cyan-700',
-    bgClass: 'bg-cyan-500/10',
-    textClass: 'text-cyan-400',
-    borderClass: 'border-cyan-500/30'
-  },
-  'api/backend': {
-    color: 'orange',
-    gradient: 'from-orange-500 to-orange-700',
-    bgClass: 'bg-orange-500/10',
-    textClass: 'text-orange-400',
-    borderClass: 'border-orange-500/30'
-  },
-  'observability': {
-    color: 'indigo',
-    gradient: 'from-indigo-500 to-indigo-700',
-    bgClass: 'bg-indigo-500/10',
-    textClass: 'text-indigo-400',
-    borderClass: 'border-indigo-500/30'
-  },
-  'ml/data-science': {
-    color: 'red',
-    gradient: 'from-red-500 to-red-700',
-    bgClass: 'bg-red-500/10',
-    textClass: 'text-red-400',
-    borderClass: 'border-red-500/30'
-  },
-  'security': {
-    color: 'emerald',
-    gradient: 'from-emerald-500 to-emerald-700',
-    bgClass: 'bg-emerald-500/10',
-    textClass: 'text-emerald-400',
-    borderClass: 'border-emerald-500/30'
-  },
-  'uncategorized': {
-    color: 'gray',
-    gradient: 'from-gray-500 to-gray-700',
-    bgClass: 'bg-gray-500/10',
-    textClass: 'text-gray-400',
-    borderClass: 'border-gray-500/30'
-  },
 }
 
 const POSTS_PER_PAGE = 30
@@ -188,7 +109,7 @@ export default function TimelineCards({ entries, onPostClick }: TimelineCardsPro
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {displayedEntries.map((entry, idx) => {
           const primaryLayer = entry.layers[0] || 'uncategorized'
-          const config = LAYER_CONFIG[primaryLayer] || LAYER_CONFIG['uncategorized']
+          const config = getLayerConfig(primaryLayer)
 
           return (
             <article
@@ -207,7 +128,7 @@ export default function TimelineCards({ entries, onPostClick }: TimelineCardsPro
                 {/* Category badge */}
                 <div className="absolute top-3 left-3">
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-white/20 backdrop-blur-sm text-white border border-white/30">
-                    {primaryLayer}
+                    {getLayerName(primaryLayer)}
                   </span>
                 </div>
 
@@ -236,13 +157,13 @@ export default function TimelineCards({ entries, onPostClick }: TimelineCardsPro
                 <div className="flex items-center justify-between pt-3 border-t border-gray-700/50">
                   <div className="flex items-center gap-2">
                     {entry.layers.slice(0, 2).map((layer, i) => {
-                      const layerConfig = LAYER_CONFIG[layer] || LAYER_CONFIG['uncategorized']
+                      const layerConfig = getLayerConfig(layer)
                       return (
                         <span
                           key={i}
                           className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${layerConfig.bgClass} ${layerConfig.textClass} ${layerConfig.borderClass} border`}
                         >
-                          {layer}
+                          {getLayerName(layer)}
                         </span>
                       )
                     })}

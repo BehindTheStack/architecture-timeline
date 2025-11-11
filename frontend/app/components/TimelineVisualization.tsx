@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from 'react'
 import { Timeline } from 'vis-timeline/standalone'
 import 'vis-timeline/styles/vis-timeline-graph2d.css'
+import { getLayerConfig, getLayerName } from '../lib/layers'
 
 interface TimelineEntry {
   path: string
@@ -15,20 +16,6 @@ interface TimelineEntry {
 interface TimelineVisualizationProps {
   entries: TimelineEntry[]
   onPostClick: (entry: TimelineEntry) => void
-}
-
-const LAYER_COLORS: Record<string, string> = {
-  'data': '#3b82f6',
-  'streaming': '#a855f7',
-  'video/encoding': '#ec4899',
-  'infrastructure': '#10b981',
-  'platform': '#eab308',
-  'frontend/ui': '#06b6d4',
-  'api/backend': '#f97316',
-  'observability': '#6366f1',
-  'ml/data-science': '#ef4444',
-  'security': '#059669',
-  'uncategorized': '#6b7280',
 }
 
 export default function TimelineVisualization({ entries, onPostClick }: TimelineVisualizationProps) {
@@ -55,7 +42,8 @@ export default function TimelineVisualization({ entries, onPostClick }: Timeline
     // Prepare data for vis-timeline
     const items = sortedEntries.map((entry, idx) => {
       const primaryLayer = entry.layers[0] || 'uncategorized'
-      const layerColor = LAYER_COLORS[primaryLayer] || LAYER_COLORS['uncategorized']
+      const layerConfig = getLayerConfig(primaryLayer)
+      const layerColor = layerConfig.hexColor
       
       return {
         id: idx,
@@ -72,11 +60,13 @@ export default function TimelineVisualization({ entries, onPostClick }: Timeline
     // Create groups - apenas layers que aparecem nos items filtrados
     const uniqueLayers = Array.from(new Set(sortedEntries.flatMap(e => e.layers))).sort()
     const groups = uniqueLayers.map(layer => {
-      const layerColor = LAYER_COLORS[layer] || LAYER_COLORS['uncategorized']
+      const layerConfig = getLayerConfig(layer)
+      const layerColor = layerConfig.hexColor
+      const layerName = getLayerName(layer)
       const count = sortedEntries.filter(e => e.layers.includes(layer)).length
       return {
         id: layer,
-        content: `<div style="font-weight: 600; color: ${layerColor}; font-size: 11px;">${layer} (${count})</div>`,
+        content: `<div style="font-weight: 600; color: ${layerColor}; font-size: 11px;">${layerName} (${count})</div>`,
         className: 'timeline-group',
       }
     })

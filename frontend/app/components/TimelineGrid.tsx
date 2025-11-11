@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react'
 import { Calendar, Clock, Layers, ChevronDown, ChevronUp } from 'lucide-react'
+import { getLayerConfig, getLayerName } from '../lib/layers'
 
 interface TimelineEntry {
   path: string
@@ -16,18 +17,12 @@ interface TimelineGridProps {
   onPostClick: (entry: TimelineEntry) => void
 }
 
-const LAYER_COLORS: Record<string, string> = {
-  'data': 'bg-blue-500/20 text-blue-400 border-blue-500/50',
-  'streaming': 'bg-purple-500/20 text-purple-400 border-purple-500/50',
-  'video/encoding': 'bg-pink-500/20 text-pink-400 border-pink-500/50',
-  'infrastructure': 'bg-green-500/20 text-green-400 border-green-500/50',
-  'platform': 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50',
-  'frontend/ui': 'bg-cyan-500/20 text-cyan-400 border-cyan-500/50',
-  'api/backend': 'bg-orange-500/20 text-orange-400 border-orange-500/50',
-  'observability': 'bg-indigo-500/20 text-indigo-400 border-indigo-500/50',
-  'ml/data-science': 'bg-red-500/20 text-red-400 border-red-500/50',
-  'security': 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50',
-  'uncategorized': 'bg-gray-500/20 text-gray-400 border-gray-500/50',
+/**
+ * Helper to get layer color classes (combines bg, text, border)
+ */
+const getLayerColorClasses = (layerId: string): string => {
+  const config = getLayerConfig(layerId)
+  return `${config.bgClass} ${config.textClass} ${config.borderClass}`
 }
 
 export default function TimelineGrid({ entries, onPostClick }: TimelineGridProps) {
@@ -119,7 +114,7 @@ export default function TimelineGrid({ entries, onPostClick }: TimelineGridProps
                 <div className="p-3 space-y-2 bg-gray-900/30">
                   {posts.map((post, idx) => {
                     const primaryLayer = post.layers[0] || 'uncategorized'
-                    const layerColor = LAYER_COLORS[primaryLayer] || LAYER_COLORS['uncategorized']
+                    const layerColor = getLayerColorClasses(primaryLayer)
                     
                     return (
                       <button
@@ -145,9 +140,9 @@ export default function TimelineGrid({ entries, onPostClick }: TimelineGridProps
                             {post.layers.slice(0, 2).map((layer, i) => (
                               <span
                                 key={i}
-                                className={`text-xs px-2 py-0.5 rounded border ${LAYER_COLORS[layer] || LAYER_COLORS['uncategorized']} whitespace-nowrap`}
+                                className={`text-xs px-2 py-0.5 rounded border ${getLayerColorClasses(layer)} whitespace-nowrap`}
                               >
-                                {layer}
+                                {getLayerName(layer)}
                               </span>
                             ))}
                             {post.layers.length > 2 && (

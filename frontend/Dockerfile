@@ -1,4 +1,4 @@
-# Dockerfile para Netflix Architecture Timeline - Frontend
+# Dockerfile para Architecture Timeline - Frontend
 # Multi-stage build otimizado para produção
 
 FROM node:18-alpine AS base
@@ -25,7 +25,7 @@ ARG VCS_REF
 ARG NODE_ENV=production
 
 LABEL org.opencontainers.image.source="https://github.com/BehindTheStack/medium-scrap"
-LABEL org.opencontainers.image.description="Netflix Architecture Timeline Frontend"
+LABEL org.opencontainers.image.description="Architecture Timeline Frontend"
 LABEL org.opencontainers.image.created=$BUILD_DATE
 LABEL org.opencontainers.image.revision=$VCS_REF
 

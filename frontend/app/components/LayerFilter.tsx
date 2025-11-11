@@ -1,7 +1,8 @@
 'use client'
 
 import React from 'react'
-import { Filter } from 'lucide-react'
+import { X, Filter } from 'lucide-react'
+import { getLayerGradient, getLayerName } from '../lib/layers'
 
 interface LayerInfo {
   name: string
@@ -16,20 +17,6 @@ interface LayerFilterProps {
   onToggleLayer: (layerName: string) => void
 }
 
-const LAYER_COLORS: Record<string, string> = {
-  'data': 'from-blue-500 to-blue-700',
-  'streaming': 'from-purple-500 to-purple-700',
-  'video/encoding': 'from-pink-500 to-pink-700',
-  'infrastructure': 'from-green-500 to-green-700',
-  'platform': 'from-yellow-500 to-yellow-700',
-  'frontend/ui': 'from-cyan-500 to-cyan-700',
-  'api/backend': 'from-orange-500 to-orange-700',
-  'observability': 'from-indigo-500 to-indigo-700',
-  'ml/data-science': 'from-red-500 to-red-700',
-  'security': 'from-emerald-500 to-emerald-700',
-  'uncategorized': 'from-gray-500 to-gray-700',
-}
-
 export default function LayerFilter({ layers, selectedLayers, onToggleLayer }: LayerFilterProps) {
   return (
     <div className="bg-gray-800/30 border border-gray-700 rounded-xl p-5 backdrop-blur-sm">
@@ -41,7 +28,8 @@ export default function LayerFilter({ layers, selectedLayers, onToggleLayer }: L
       <div className="space-y-2">
         {layers.map((layer) => {
           const isSelected = selectedLayers.includes(layer.name)
-          const colorClass = LAYER_COLORS[layer.name] || LAYER_COLORS['uncategorized']
+          const colorClass = getLayerGradient(layer.name)
+          const displayName = getLayerName(layer.name)
 
           return (
             <button
@@ -55,7 +43,7 @@ export default function LayerFilter({ layers, selectedLayers, onToggleLayer }: L
             >
               <div className="flex items-center justify-between">
                 <span className={`text-sm font-medium truncate ${isSelected ? 'text-white' : 'text-gray-300'}`}>
-                  {layer.name}
+                  {displayName}
                 </span>
                 <span
                   className={`text-xs px-1.5 py-0.5 rounded ml-2 ${
@@ -81,7 +69,7 @@ export default function LayerFilter({ layers, selectedLayers, onToggleLayer }: L
           onClick={() => selectedLayers.forEach(onToggleLayer)}
           className="w-full mt-3 px-3 py-1.5 text-xs text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-md transition-all border border-red-400/30"
         >
-          Limpar filtros ({selectedLayers.length})
+          <X className="w-3.5 h-3.5" /> Clear ({selectedLayers.length})
         </button>
       )}
     </div>
