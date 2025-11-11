@@ -3,7 +3,7 @@ Netflix Architecture Timeline API
 FastAPI backend serving timeline data with filtering and search capabilities.
 Production-ready with CORS, caching, and comprehensive endpoints.
 """
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, Query, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from typing import List, Optional
@@ -11,6 +11,8 @@ from datetime import datetime
 import json
 from pathlib import Path
 from collections import defaultdict
+from functools import lru_cache
+import hashlib
 
 app = FastAPI(
     title="Netflix Architecture Timeline API",
@@ -39,7 +41,9 @@ else:
     TIMELINE_PATH = Path(__file__).resolve().parent.parent.parent / "outputs" / "Netflix_timeline.json"
 
 timeline_data = None
+timeline_hash = None  # Cache invalidation
 
+@lru_cache(maxsize=128)
 def extract_snippet_from_markdown(md_path: str, max_length: int = 200) -> str:
     """Extract a real content snippet from markdown file."""
     try:
@@ -89,10 +93,13 @@ def extract_snippet_from_markdown(md_path: str, max_length: int = 200) -> str:
 
 
 def load_timeline():
-    global timeline_data
+    global timeline_data, timeline_hash
     if timeline_data is None:
         with open(TIMELINE_PATH, 'r', encoding='utf-8') as f:
-            timeline_data = json.load(f)
+            content = f.read()
+            timeline_data = json.loads(content)
+            # Generate hash for cache validation
+            timeline_hash = hashlib.md5(content.encode()).hexdigest()
         
         # Enhance snippets if they're just "X min read"
         entries = timeline_data.get('entries', timeline_data if isinstance(timeline_data, list) else [])
@@ -112,9 +119,15 @@ def load_timeline():
 async def startup_event():
     load_timeline()
 
+def add_cache_headers(response: JSONResponse, max_age: int = 3600):
+    """Add HTTP cache headers for better performance."""
+    response.headers["Cache-Control"] = f"public, max-age={max_age}"
+    response.headers["ETag"] = timeline_hash
+    return response
+
 @app.get("/")
 async def root():
-    return {
+    response = JSONResponse({
         "message": "Netflix Architecture Timeline API",
         "version": "1.0.0",
         "endpoints": {
@@ -123,7 +136,8 @@ async def root():
             "/stats": "Get statistics about the timeline data",
             "/search": "Search posts by keyword",
         }
-    }
+    })
+    return add_cache_headers(response, 86400)  # Cache for 24 hours
 
 @app.get("/timeline")
 async def get_timeline(
@@ -161,10 +175,11 @@ async def get_timeline(
     if limit:
         entries = entries[:limit]
     
-    return {
+    response = JSONResponse({
         "count": len(entries),
         "entries": entries
-    }
+    })
+    return add_cache_headers(response, 3600)  # Cache for 1 hour
 
 @app.get("/layers")
 async def get_layers():
@@ -207,10 +222,11 @@ async def get_layers():
     # Sort by count descending
     layer_info.sort(key=lambda x: x['count'], reverse=True)
     
-    return {
+    response = JSONResponse({
         "total_layers": len(layer_info),
         "layers": layer_info
-    }
+    })
+    return add_cache_headers(response, 3600)  # Cache for 1 hour
 
 @app.get("/stats")
 async def get_stats():
@@ -237,7 +253,7 @@ async def get_stats():
     # Posts with multiple layers
     multi_layer_posts = [e for e in entries if len(e['layers']) > 1]
     
-    return {
+    response = JSONResponse({
         "total_posts": len(entries),
         "date_range": {
             "earliest": min(dates) if dates else None,
@@ -247,7 +263,8 @@ async def get_stats():
         "layer_distribution": dict(sorted(layer_counts.items(), key=lambda x: x[1], reverse=True)),
         "multi_layer_posts": len(multi_layer_posts),
         "avg_layers_per_post": sum(len(e['layers']) for e in entries) / len(entries) if entries else 0,
-    }
+    })
+    return add_cache_headers(response, 3600)  # Cache for 1 hour
 
 @app.get("/search")
 async def search_posts(
@@ -278,11 +295,13 @@ async def search_posts(
             if any(layer in e['layers'] for layer in layers)
         ]
     
-    return {
+    response = JSONResponse({
         "query": q,
         "count": len(results),
         "results": results
-    }
+    })
+    # Shorter cache for search (5 minutes)
+    return add_cache_headers(response, 300)
 
 @app.get("/layer/{layer_name}")
 async def get_layer_timeline(layer_name: str):

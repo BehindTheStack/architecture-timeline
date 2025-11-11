@@ -28,16 +28,19 @@
 
 - **🔍 Smart Filtering**
   - Multi-layer architecture filtering (Presentation, Application, Domain, Infrastructure, ML)
-  - Date range filtering (year-based)
+  - Date range filtering with quick presets (Last Year, Last 3/5 Years, All Time)
+  - Category multi-select with visual chips
+  - Sort options (Newest/Oldest, Title A-Z/Z-A)
   - Full-text search across titles and content
   - Real-time filter updates with 300ms debounce
 
 - **🎭 Modern UI/UX**
-  - Spotify-style credits and footer
+  - GitHub-style footer with tech stack and credits
   - Gradient-based color coding by category
   - Responsive design for all screen sizes
   - Dark mode optimized
   - Smooth animations and transitions
+  - BigTech-inspired design patterns
 
 ## 🚀 Quick Start
 
@@ -86,10 +89,10 @@ webapp/
 │   │   │   ├── TimelineGrid.tsx        # Year-collapsible grid
 │   │   │   ├── TimelineVisualization.tsx # Classic timeline
 │   │   │   ├── StatsPanel.tsx          # Analytics dashboard
-│   │   │   ├── AdvancedFilters.tsx     # Date range filters
+│   │   │   ├── AdvancedFilters.tsx     # Smart filters with presets
 │   │   │   ├── LayerFilter.tsx         # Architecture layer filters
 │   │   │   ├── PostDetail.tsx          # Modal with full post
-│   │   │   └── Credits.tsx             # Spotify-style credits
+│   │   │   └── CreditsFooter.tsx       # GitHub-style footer
 │   │   ├── page.tsx         # Main page component
 │   │   ├── layout.tsx       # Root layout
 │   │   └── globals.css      # Global styles
@@ -196,6 +199,92 @@ docker-compose -f docker-compose.dev.yml up -d --build
 - **Backend**: uvloop for faster async I/O, httptools for faster HTTP parsing
 - **Docker**: Multi-stage builds with layer caching, minimal base images
 - **UI**: Infinite scroll pagination (30 posts/page), lazy loading, debounced search
+- **Filtering**: Client-side sorting and filtering for instant response
+- **Data**: JSON-based storage with in-memory caching
+
+## 🎬 Screenshots
+
+### Cards View (Pinterest-inspired)
+Modern card layout with infinite scroll and gradient accents.
+
+### Magazine View (Medium-inspired)
+Editorial layout with large banners perfect for immersive reading.
+
+### Advanced Filters
+Quick presets, category selection, and sort options.
+
+## 📊 API Endpoints
+
+### `GET /timeline`
+Get all timeline entries with optional layer filtering.
+
+**Query Parameters:**
+- `layers` (array): Filter by architecture layers
+
+**Response:**
+```json
+{
+  "entries": [
+    {
+      "path": "string",
+      "title": "string",
+      "date": "2024-01-01",
+      "layers": ["Application", "Infrastructure"],
+      "snippet": "string"
+    }
+  ]
+}
+```
+
+### `GET /layers`
+Get all available architecture layers with metadata.
+
+**Response:**
+```json
+{
+  "layers": [
+    {
+      "name": "Application Layer",
+      "count": 150,
+      "earliest": "2010-01-01",
+      "latest": "2024-12-31"
+    }
+  ]
+}
+```
+
+### `GET /stats`
+Get comprehensive statistics about the timeline.
+
+**Query Parameters:**
+- `layers` (array): Filter statistics by layers
+
+**Response:**
+```json
+{
+  "total_posts": 541,
+  "date_range": {
+    "earliest": "2010-01-01",
+    "latest": "2024-12-31"
+  },
+  "layer_distribution": {
+    "Application Layer": 150
+  },
+  "top_years": [
+    {"year": "2023", "count": 45}
+  ],
+  "top_categories": [
+    {"category": "System Design", "count": 78}
+  ]
+}
+```
+
+### `GET /search?q={query}`
+Full-text search across posts.
+
+**Query Parameters:**
+- `q` (string): Search query
+- `layers` (array): Optional layer filtering
 
 ## 🤝 Contributing
 
@@ -210,6 +299,38 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+### Usage and Attribution
+
+This project is **open source** and **free to use** for:
+- ✅ Personal projects and learning
+- ✅ Commercial applications
+- ✅ Portfolio demonstrations
+- ✅ Educational purposes
+- ✅ Research and analysis
+
+**We encourage:**
+- 🌟 **Star this repository** if you find it useful
+- 🔗 **Link back** to this project in your README or about page
+- 💬 **Share** what you built with it!
+- 🤝 **Contribute** improvements back to the community
+
+**Optional Attribution:**
+```markdown
+Built with [Architecture Timeline](https://github.com/BehindTheStack/architecture-timeline) by BehindTheStack
+```
+
+**No attribution required**, but greatly appreciated! ❤️
+
+### What You Can Do
+- ✅ Use this code in your own projects
+- ✅ Modify and adapt for your needs
+- ✅ Create derivative works
+- ✅ Use commercially without fees
+- ✅ Fork and create your own version
+
+### Data Source
+The Netflix blog posts data is publicly available from [Netflix Tech Blog](https://netflixtechblog.com/). This project provides a visualization layer for educational and analysis purposes.
 
 ## 🎯 Roadmap
 

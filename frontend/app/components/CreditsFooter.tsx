@@ -53,14 +53,24 @@ export default function CreditsFooter() {
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white transition-colors group"
+              title="Star on GitHub"
             >
               <Github className="w-4 h-4" />
               <span>View Source</span>
               <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
             </a>
-            <div className="flex items-center gap-1 text-xs text-gray-600">
-              <Heart className="w-3 h-3 text-red-500 fill-red-500" />
+            <div className="flex items-center gap-1.5 text-xs text-gray-600">
               <span>© {getCurrentYear()}</span>
+              <span className="text-gray-700">•</span>
+              <a 
+                href="https://github.com/BehindTheStack/architecture-timeline/blob/main/LICENSE"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-500 hover:text-gray-400 transition-colors"
+                title="MIT License - Free to use"
+              >
+                MIT License
+              </a>
             </div>
           </div>
         </div>

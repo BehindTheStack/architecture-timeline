@@ -308,13 +308,6 @@ export default function Home() {
             </div>
             {!loading && entries.length > 0 && (
               <div className="flex items-center justify-between">
-                <p className="text-xs text-gray-500 flex items-center gap-2">
-                  <Calendar className="w-3.5 h-3.5" />
-                  {viewMode === 'cards' && '💡 Cards modernos com infinite scroll • Clique para ver detalhes'}
-                  {viewMode === 'magazine' && '💡 Layout editorial estilo Medium • Scroll para explorar'}
-                  {viewMode === 'grid' && '💡 Clique nos anos para expandir • Vista compacta'}
-                  {viewMode === 'timeline' && '💡 Zoom com Ctrl+Scroll | Arraste para navegar'}
-                </p>
                 {viewMode === 'timeline' && entries.length > 300 && (
                   <span className="text-xs text-yellow-500 bg-yellow-500/10 px-2 py-1 rounded border border-yellow-500/30">
                     ⚠️ {entries.length} posts - Cards/Magazine View recomendados
