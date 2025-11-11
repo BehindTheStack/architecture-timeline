@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Search, BarChart3, Calendar, Layers, Grid3x3, LayoutGrid, BookOpen } from 'lucide-react'
 import TimelineVisualization from './components/TimelineVisualization'
 import TimelineGrid from './components/TimelineGrid'
@@ -31,6 +31,7 @@ interface LayerInfo {
 
 export default function Home() {
   const [entries, setEntries] = useState<TimelineEntry[]>([])
+  const [allEntries, setAllEntries] = useState<TimelineEntry[]>([]) // Store all entries for client-side filtering
   const [layers, setLayers] = useState<LayerInfo[]>([])
   const [selectedLayers, setSelectedLayers] = useState<string[]>([])
   const [selectedPost, setSelectedPost] = useState<TimelineEntry | null>(null)
@@ -42,6 +43,8 @@ export default function Home() {
     startYear: null, 
     endYear: null 
   })
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [sortBy, setSortBy] = useState<string>('date-desc')
 
   useEffect(() => {
     fetchLayers()
@@ -58,7 +61,7 @@ export default function Home() {
     }, 300) // Debounce 300ms
 
     return () => clearTimeout(timer)
-  }, [selectedLayers, searchQuery, dateRange])
+  }, [selectedLayers, searchQuery, dateRange, sortBy])
 
   const fetchLayers = async () => {
     try {
@@ -79,6 +82,9 @@ export default function Home() {
       const response = await fetch(`${API_BASE}/timeline?${params}`)
       const data = await response.json()
       
+      // Store all entries for category extraction
+      setAllEntries(data.entries)
+      
       // Apply date range filter client-side
       let filteredEntries = data.entries
       if (dateRange.startYear || dateRange.endYear) {
@@ -91,7 +97,10 @@ export default function Home() {
         })
       }
       
-      setEntries(filteredEntries)
+      // Apply sorting
+      const sortedEntries = sortEntries(filteredEntries)
+      
+      setEntries(sortedEntries)
     } catch (error) {
       console.error('Failed to fetch timeline:', error)
     } finally {
@@ -151,6 +160,53 @@ export default function Home() {
       endYear: endYear ? parseInt(endYear) : null 
     })
   }
+
+  const handleCategoryChange = (categories: string[]) => {
+    setSelectedCategories(categories)
+  }
+
+  const handleSortChange = (sort: string) => {
+    setSortBy(sort)
+  }
+
+  // Apply client-side sorting
+  const sortEntries = (entriesToSort: TimelineEntry[]) => {
+    const sorted = [...entriesToSort]
+    switch (sortBy) {
+      case 'date-desc':
+        return sorted.sort((a, b) => {
+          if (!a.date) return 1
+          if (!b.date) return -1
+          return new Date(b.date).getTime() - new Date(a.date).getTime()
+        })
+      case 'date-asc':
+        return sorted.sort((a, b) => {
+          if (!a.date) return 1
+          if (!b.date) return -1
+          return new Date(a.date).getTime() - new Date(b.date).getTime()
+        })
+      case 'title-asc':
+        return sorted.sort((a, b) => a.title.localeCompare(b.title))
+      case 'title-desc':
+        return sorted.sort((a, b) => b.title.localeCompare(a.title))
+      default:
+        return sorted
+    }
+  }
+
+  // Get unique categories from entries
+  const availableCategories = React.useMemo(() => {
+    const categories = new Set<string>()
+    allEntries.forEach(entry => {
+      // Extract category from title or use a default
+      // This is a simple heuristic - adjust based on your data structure
+      const match = entry.title.match(/\[(.*?)\]/)
+      if (match) {
+        categories.add(match[1])
+      }
+    })
+    return Array.from(categories).sort()
+  }, [allEntries])
 
   // Calculate min and max years from entries
   const getYearRange = () => {
@@ -282,8 +338,11 @@ export default function Home() {
 
             <AdvancedFilters
               onDateRangeChange={handleDateRangeChange}
+              onCategoryChange={handleCategoryChange}
+              onSortChange={handleSortChange}
               minDate={`${minYear}-01-01`}
               maxDate={`${maxYear}-12-31`}
+              availableCategories={availableCategories}
             />
 
             {showStats && (

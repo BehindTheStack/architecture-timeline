@@ -9,6 +9,12 @@ import { Code, Heart, Github, ExternalLink, Sparkles } from 'lucide-react'
  * Inspiração: GitHub, GitLab, Notion
  */
 export default function CreditsFooter() {
+  
+  function getCurrentYear() {
+    /* Get the current year */
+    return new Date().getFullYear();
+  }
+
   return (
     <footer className="fixed bottom-0 left-0 right-0 z-40 border-t border-gray-800/50 bg-black/80 backdrop-blur-xl">
       <div className="container mx-auto px-6 py-4">
@@ -54,7 +60,7 @@ export default function CreditsFooter() {
             </a>
             <div className="flex items-center gap-1 text-xs text-gray-600">
               <Heart className="w-3 h-3 text-red-500 fill-red-500" />
-              <span>© 2025</span>
+              <span>© {getCurrentYear()}</span>
             </div>
           </div>
         </div>
