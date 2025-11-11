@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Calendar, Filter, X, ChevronDown, ChevronUp, Tag, ArrowUpDown, Zap } from 'lucide-react'
+import { Calendar, X, ChevronDown, ChevronUp, Tag, ArrowUpDown, Zap, Filter } from 'lucide-react'
 
 interface AdvancedFiltersProps {
   onDateRangeChange: (start: string | null, end: string | null) => void
@@ -12,7 +12,14 @@ interface AdvancedFiltersProps {
   availableCategories?: string[]
 }
 
-export default function AdvancedFilters({ 
+/**
+ * OPÇÃO 1: "Spotify Controls Style"
+ * - Controles compactos com ícones destacados
+ * - Seções expansíveis com animações suaves
+ * - Badge de "Active" quando tem filtros
+ * - Design minimalista e elegante
+ */
+export default function AdvancedFiltersSpotify({ 
   onDateRangeChange, 
   onCategoryChange,
   onSortChange,
@@ -37,17 +44,15 @@ export default function AdvancedFilters({
     return yearList
   }, [minDate, maxDate])
 
-  // Quick preset ranges
   const quickPresets = [
-    { label: 'Last Year', years: 1 },
-    { label: 'Last 3 Years', years: 3 },
-    { label: 'Last 5 Years', years: 5 },
-    { label: 'All Time', years: null },
+    { label: 'Last Year', years: 1, icon: '1Y' },
+    { label: 'Last 3 Years', years: 3, icon: '3Y' },
+    { label: 'Last 5 Years', years: 5, icon: '5Y' },
+    { label: 'All Time', years: null, icon: '∞' },
   ]
 
   const handleQuickPreset = (yearsAgo: number | null) => {
     if (yearsAgo === null) {
-      // All time
       setStartYear('')
       setEndYear('')
       onDateRangeChange(null, null)
@@ -92,129 +97,139 @@ export default function AdvancedFilters({
   const hasActiveFilters = startYear || endYear || selectedCategories.length > 0 || sortBy !== 'date-desc'
 
   return (
-    <div className="bg-gray-800/30 border border-gray-700 rounded-xl overflow-hidden backdrop-blur-sm">
-      {/* Header */}
+    <div className="bg-gradient-to-br from-gray-800/40 to-gray-800/20 border border-gray-700/50 rounded-2xl overflow-hidden backdrop-blur-sm">
+      {/* Header - Spotify style with play button aesthetic */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-800/50 transition-colors"
+        className="w-full px-5 py-4 flex items-center justify-between hover:bg-gray-800/30 transition-all group"
       >
-        <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-blue-400" />
-          <span className="text-sm font-semibold text-white">Advanced Filters</span>
-          {hasActiveFilters && (
-            <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-500/30">
-              Active
-            </span>
-          )}
+        <div className="flex items-center gap-3">
+          <div className={`p-2 rounded-lg transition-all ${hasActiveFilters ? 'bg-blue-500/20' : 'bg-gray-700/30 group-hover:bg-gray-700/50'}`}>
+            <Filter className={`w-4 h-4 transition-colors ${hasActiveFilters ? 'text-blue-400' : 'text-gray-400 group-hover:text-gray-300'}`} />
+          </div>
+          <div className="text-left">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-white">Advanced Filters</span>
+              {hasActiveFilters && (
+                <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full font-medium border border-blue-500/30">
+                  Active
+                </span>
+              )}
+            </div>
+            {hasActiveFilters && (
+              <div className="text-xs text-gray-400 mt-0.5">
+                {[
+                  startYear || endYear ? '📅 Date' : null,
+                  selectedCategories.length > 0 ? `🏷️ ${selectedCategories.length} cats` : null,
+                  sortBy !== 'date-desc' ? '🔽 Sorted' : null
+                ].filter(Boolean).join(' • ')}
+              </div>
+            )}
+          </div>
         </div>
-        {isExpanded ? (
-          <ChevronUp className="w-4 h-4 text-gray-400" />
-        ) : (
+        <div className={`p-1.5 rounded-full transition-all ${isExpanded ? 'bg-gray-700/50 rotate-180' : 'bg-transparent'}`}>
           <ChevronDown className="w-4 h-4 text-gray-400" />
-        )}
+        </div>
       </button>
 
-      {/* Content */}
+      {/* Content - Smooth expand */}
       {isExpanded && (
-        <div className="px-4 pb-4 space-y-4">
-          {/* Quick Presets */}
+        <div className="px-5 pb-5 space-y-4 animate-fadeIn">
+          {/* Quick Presets - Spotify playback controls inspired */}
           <div>
-            <div className="flex items-center gap-2 mb-2">
+            <label className="flex items-center gap-2 text-xs font-bold text-gray-300 mb-2.5">
               <Zap className="w-3.5 h-3.5 text-yellow-400" />
-              <label className="text-xs font-medium text-gray-300">Quick Presets</label>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
+              Quick Select
+            </label>
+            <div className="grid grid-cols-4 gap-2">
               {quickPresets.map((preset) => (
                 <button
                   key={preset.label}
                   onClick={() => handleQuickPreset(preset.years)}
-                  className="px-3 py-2 bg-gray-700/30 hover:bg-gray-700/50 border border-gray-600/50 hover:border-blue-500/50 rounded-lg text-xs text-gray-300 hover:text-white transition-all"
+                  className="aspect-square flex flex-col items-center justify-center bg-gray-800/40 hover:bg-gray-700/60 border border-gray-700/50 hover:border-blue-500/50 rounded-xl transition-all group"
+                  title={preset.label}
                 >
-                  {preset.label}
+                  <span className="text-lg font-bold text-white group-hover:text-blue-400 transition-colors">
+                    {preset.icon}
+                  </span>
+                  <span className="text-xs text-gray-500 group-hover:text-gray-400 mt-1">
+                    {preset.label.split(' ')[0]}
+                  </span>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Date Range Filter */}
+          {/* Date Range - Compact inline */}
           <div>
-            <div className="flex items-center gap-2 mb-3">
+            <label className="flex items-center gap-2 text-xs font-bold text-gray-300 mb-2.5">
               <Calendar className="w-3.5 h-3.5 text-gray-400" />
-              <label className="text-xs font-medium text-gray-300">Custom Range</label>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              {/* Start Year */}
-              <div>
-                <label className="text-xs text-gray-500 mb-1 block">From</label>
-                <select
-                  value={startYear}
-                  onChange={(e) => setStartYear(e.target.value)}
-                  className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="">Any</option>
-                  {years.map(year => (
-                    <option key={year} value={year}>{year}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* End Year */}
-              <div>
-                <label className="text-xs text-gray-500 mb-1 block">To</label>
-                <select
-                  value={endYear}
-                  onChange={(e) => setEndYear(e.target.value)}
-                  className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="">Any</option>
-                  {years.map(year => (
-                    <option key={year} value={year}>{year}</option>
-                  ))}
-                </select>
-              </div>
+              Custom Range
+            </label>
+            <div className="flex items-center gap-2">
+              <select
+                value={startYear}
+                onChange={(e) => setStartYear(e.target.value)}
+                className="flex-1 bg-gray-800/50 border border-gray-700/50 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent"
+              >
+                <option value="">From</option>
+                {years.map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+              <span className="text-gray-600">→</span>
+              <select
+                value={endYear}
+                onChange={(e) => setEndYear(e.target.value)}
+                className="flex-1 bg-gray-800/50 border border-gray-700/50 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent"
+              >
+                <option value="">To</option>
+                {years.map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
             </div>
           </div>
 
-          {/* Sort Options */}
+          {/* Sort - Compact select */}
           <div>
-            <div className="flex items-center gap-2 mb-3">
+            <label className="flex items-center gap-2 text-xs font-bold text-gray-300 mb-2.5">
               <ArrowUpDown className="w-3.5 h-3.5 text-gray-400" />
-              <label className="text-xs font-medium text-gray-300">Sort By</label>
-            </div>
+              Sort Order
+            </label>
             <select
               value={sortBy}
               onChange={(e) => handleSortChange(e.target.value)}
-              className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full bg-gray-800/50 border border-gray-700/50 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent"
             >
-              <option value="date-desc">Newest First</option>
-              <option value="date-asc">Oldest First</option>
-              <option value="title-asc">Title (A-Z)</option>
-              <option value="title-desc">Title (Z-A)</option>
+              <option value="date-desc">⬇️ Newest First</option>
+              <option value="date-asc">⬆️ Oldest First</option>
+              <option value="title-asc">🔤 Title (A-Z)</option>
+              <option value="title-desc">🔤 Title (Z-A)</option>
             </select>
           </div>
 
-          {/* Category Filter */}
+          {/* Categories - Pills */}
           {availableCategories.length > 0 && (
             <div>
-              <div className="flex items-center gap-2 mb-3">
+              <label className="flex items-center gap-2 text-xs font-bold text-gray-300 mb-2.5">
                 <Tag className="w-3.5 h-3.5 text-gray-400" />
-                <label className="text-xs font-medium text-gray-300">Categories</label>
+                Categories
                 {selectedCategories.length > 0 && (
-                  <span className="px-2 py-0.5 bg-purple-500/20 text-purple-400 text-xs rounded-full">
+                  <span className="px-2 py-0.5 bg-purple-500/20 text-purple-400 text-xs rounded-full font-medium">
                     {selectedCategories.length}
                   </span>
                 )}
-              </div>
-              <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto">
-                {availableCategories.slice(0, 10).map((category) => (
+              </label>
+              <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
+                {availableCategories.slice(0, 12).map((category) => (
                   <button
                     key={category}
                     onClick={() => toggleCategory(category)}
-                    className={`px-2.5 py-1 text-xs rounded-full border transition-all ${
+                    className={`px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-all ${
                       selectedCategories.includes(category)
                         ? 'bg-purple-500/20 text-purple-300 border-purple-500/50'
-                        : 'bg-gray-700/30 text-gray-400 border-gray-600/50 hover:border-purple-500/30 hover:text-gray-300'
+                        : 'bg-gray-800/40 text-gray-400 border-gray-700/50 hover:border-purple-500/30 hover:text-gray-300'
                     }`}
                   >
                     {category}
@@ -224,50 +239,25 @@ export default function AdvancedFilters({
             </div>
           )}
 
-          {/* Action Buttons */}
+          {/* Actions - Spotify button style */}
           <div className="flex gap-2 pt-2">
             <button
               onClick={handleApply}
               disabled={!startYear && !endYear}
-              className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:text-gray-500 text-white text-sm font-medium rounded-lg transition-colors disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700/50 disabled:text-gray-500 text-white text-sm font-bold rounded-full transition-all disabled:cursor-not-allowed shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30"
             >
-              Apply
+              Apply Filters
             </button>
             {hasActiveFilters && (
               <button
                 onClick={handleClear}
-                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-1"
+                className="px-4 py-2.5 bg-gray-700/50 hover:bg-gray-700 text-white text-sm font-bold rounded-full transition-all flex items-center gap-1.5"
               >
                 <X className="w-3.5 h-3.5" />
                 Clear
               </button>
             )}
           </div>
-
-          {/* Info */}
-          {hasActiveFilters && (
-            <div className="pt-2 border-t border-gray-700 space-y-1">
-              {(startYear || endYear) && (
-                <p className="text-xs text-gray-500">
-                  📅 Range: <span className="text-blue-400 font-medium">{startYear || 'earliest'}</span>
-                  {' → '}
-                  <span className="text-blue-400 font-medium">{endYear || 'latest'}</span>
-                </p>
-              )}
-              {selectedCategories.length > 0 && (
-                <p className="text-xs text-gray-500">
-                  🏷️ Categories: <span className="text-purple-400 font-medium">{selectedCategories.join(', ')}</span>
-                </p>
-              )}
-              {sortBy !== 'date-desc' && (
-                <p className="text-xs text-gray-500">
-                  🔽 Sort: <span className="text-gray-400 font-medium">
-                    {sortBy === 'date-asc' ? 'Oldest First' : sortBy === 'title-asc' ? 'Title (A-Z)' : 'Title (Z-A)'}
-                  </span>
-                </p>
-              )}
-            </div>
-          )}
         </div>
       )}
     </div>

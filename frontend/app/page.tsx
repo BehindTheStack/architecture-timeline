@@ -6,11 +6,13 @@ import TimelineVisualization from './components/TimelineVisualization'
 import TimelineGrid from './components/TimelineGrid'
 import TimelineMagazine from './components/TimelineMagazine'
 import TimelineCards from './components/TimelineCards'
-import LayerFilter from './components/LayerFilter'
 import StatsPanel from './components/StatsPanel'
 import PostDetail from './components/PostDetail'
-import AdvancedFilters from './components/AdvancedFilters'
 import CreditsFooter from './components/CreditsFooter'
+
+import LayerFilter from './components/LayerFilter'
+import AdvancedFilters from './components/AdvancedFilters'
+
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
